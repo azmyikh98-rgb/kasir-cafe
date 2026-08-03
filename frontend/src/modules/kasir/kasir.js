@@ -57,7 +57,7 @@ export const template = `
     </div>
 
     <div class="modal-backdrop" id="cartModal" style="display:none;">
-      <div class="card cart-panel">
+      <div class="card cart-panel cart-panel-2col">
         <div class="cart-head">
           <h3>Keranjang</h3>
           <div class="cart-head-right">
@@ -67,78 +67,84 @@ export const template = `
             </button>
           </div>
         </div>
-        <div class="cart-body" id="cartItems">
-          <div class="cart-empty">
-            <svg class="icon-lg" viewBox="0 0 24 24" style="color:#cbd5e1;"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-            <div>Keranjang masih kosong</div>
-            <div style="font-size:11.5px;">Klik produk di sebelah kiri untuk mulai</div>
-          </div>
-        </div>
-        <div class="cart-summary">
-          <div class="form-field customer-select-wrap">
-            <label>Pelanggan</label>
-            <div class="customer-select-box" id="customerSelectBox">
-              <svg class="icon-sm" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-              <span id="customerSelectLabel">Pelanggan Umum</span>
-            </div>
-            <div class="customer-dropdown" id="customerDropdown" style="display:none;"></div>
-          </div>
-          <div class="form-field" id="ordererNameRow">
-            <label>Nama Pemesan <span style="color:var(--color-danger);">*</span></label>
-            <input type="text" id="ordererName" placeholder="mis. Budi" maxlength="60">
-          </div>
-          <div class="form-row-2">
-            <div class="form-field">
-              <label>Tipe Pesanan</label>
-              <select id="orderType">
-                <option value="dine-in">Dine-in</option>
-                <option value="takeaway">Takeaway</option>
-              </select>
-            </div>
-            <div class="form-field" id="tableNumberRow">
-              <label>Nomor Meja</label>
-              <input type="text" id="tableNumber" placeholder="mis. 5">
+        <div class="cart-columns">
+          <div class="cart-col-items">
+            <div class="cart-body" id="cartItems">
+              <div class="cart-empty">
+                <svg class="icon-lg" viewBox="0 0 24 24" style="color:#cbd5e1;"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                <div>Keranjang masih kosong</div>
+                <div style="font-size:11.5px;">Klik produk di sebelah kiri untuk mulai</div>
+              </div>
             </div>
           </div>
-          <div class="sum-row"><span>Subtotal</span><span id="sumSubtotal">Rp 0</span></div>
-          <div class="form-row-2">
-            <div class="form-field">
-              <label>Diskon (Rp)</label>
-              <input type="number" id="discountInput" placeholder="0" value="0">
-            </div>
-            <div class="form-field">
-              <label>Pajak (%)</label>
-              <input type="number" id="taxPercentInput" placeholder="0" value="0">
-            </div>
-          </div>
-          <div class="sum-row grand"><span>Grand Total</span><span id="sumTotal">Rp 0</span></div>
+          <div class="cart-col-form">
+            <div class="cart-summary">
+              <div class="form-field customer-select-wrap">
+                <label>Pelanggan</label>
+                <div class="customer-select-box" id="customerSelectBox">
+                  <svg class="icon-sm" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                  <span id="customerSelectLabel">Pelanggan Umum</span>
+                </div>
+                <div class="customer-dropdown" id="customerDropdown" style="display:none;"></div>
+              </div>
+              <div class="form-field" id="ordererNameRow">
+                <label>Nama Pemesan <span style="color:var(--color-danger);">*</span></label>
+                <input type="text" id="ordererName" placeholder="mis. Budi" maxlength="60">
+              </div>
+              <div class="form-row-2">
+                <div class="form-field">
+                  <label>Tipe Pesanan</label>
+                  <select id="orderType">
+                    <option value="dine-in">Dine-in</option>
+                    <option value="takeaway">Takeaway</option>
+                  </select>
+                </div>
+                <div class="form-field" id="tableNumberRow">
+                  <label>Nomor Meja</label>
+                  <input type="text" id="tableNumber" placeholder="mis. 5">
+                </div>
+              </div>
+              <div class="sum-row"><span>Subtotal</span><span id="sumSubtotal">Rp 0</span></div>
+              <div class="form-row-2">
+                <div class="form-field">
+                  <label>Diskon (Rp)</label>
+                  <input type="number" id="discountInput" placeholder="0" value="0">
+                </div>
+                <div class="form-field">
+                  <label>Pajak (%)</label>
+                  <input type="number" id="taxPercentInput" placeholder="0" value="0">
+                </div>
+              </div>
+              <div class="sum-row grand"><span>Grand Total</span><span id="sumTotal">Rp 0</span></div>
 
-          <div class="form-row-2">
-            <div class="form-field">
-              <label>Metode Pembayaran</label>
-              <select id="paymentMethod">
-                <option value="cash">Tunai</option>
-                <option value="qris">QRIS</option>
-                <option value="debit">Kartu Debit</option>
-              </select>
-            </div>
-            <div class="form-field" id="cashGivenRow">
-              <label>Uang Diterima</label>
-              <input type="number" id="cashGiven" placeholder="0">
-            </div>
-          </div>
-          <div class="sum-row" id="changeRow" style="display:none;"><span>Kembalian</span><span id="changeAmount" style="font-weight:800;color:var(--color-success);">Rp 0</span></div>
+              <div class="form-row-2">
+                <div class="form-field">
+                  <label>Metode Pembayaran</label>
+                  <select id="paymentMethod">
+                    <option value="cash">Tunai</option>
+                    <option value="qris">QRIS</option>
+                    <option value="debit">Kartu Debit</option>
+                  </select>
+                </div>
+                <div class="form-field" id="cashGivenRow">
+                  <label>Uang Diterima</label>
+                  <input type="number" id="cashGiven" placeholder="0">
+                </div>
+              </div>
+              <div class="sum-row" id="changeRow" style="display:none;"><span>Kembalian</span><span id="changeAmount" style="font-weight:800;color:var(--color-success);">Rp 0</span></div>
 
-          <div class="cart-actions">
-            <button class="btn btn-warning" id="holdBtn" title="F3">
-              <svg class="icon icon-sm" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
-              Hold
-            </button>
-            <button class="btn btn-danger" id="cancelBtn" title="Esc">
-              <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
-              Batal
-            </button>
-            <button class="btn btn-primary btn-cta" id="checkoutBtn" title="F2">Bayar Sekarang</button>
+              <div class="cart-actions">
+                <button class="btn btn-warning" id="holdBtn" title="F3">
+                  <svg class="icon icon-sm" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                  Hold
+                </button>
+                <button class="btn btn-danger" id="cancelBtn" title="Esc">
+                  <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+                  Batal
+                </button>
+                <button class="btn btn-primary btn-cta" id="checkoutBtn" title="F2">Bayar Sekarang</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
