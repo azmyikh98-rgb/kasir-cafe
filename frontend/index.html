@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kasir Cafe</title>
+<script>
+  // Cek paling awal, sebelum modul JS lain dimuat -- kalau tidak ada token
+  // login tersimpan, langsung lempar ke halaman login. Ini jaga-jaga supaya
+  // pengalaman "buka link utama -> ke login" tetap cepat & pasti, tidak
+  // bergantung pada seluruh proses bootstrap aplikasi (main.js) berhasil
+  // duluan. Kalau ada token (mungkin sudah kadaluarsa), main.js tetap akan
+  // memverifikasinya ke server lewat requireSession() seperti biasa.
+  if (!localStorage.getItem('kasir_token')) {
+    window.location.replace('./login.html');
+  }
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="logo-badge">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M3 3h18v6a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V3z"/><path d="M7 13v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-5"/><path d="M17 8h2a2 2 0 0 1 2 2v1a2 2 0 0 1-2 2h-2"/></svg>
+      </div>
+      <span class="brand-text">Kasir Cafe</span>
+    </div>
+    <nav class="sidebar-nav" id="sidebarNav"></nav>
+    <div class="sidebar-footer">
+      <button class="collapse-btn" id="collapseBtn">
+        <svg class="icon-sm" id="collapseIcon" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+        <span id="collapseLabel">Ciutkan Menu</span>
+      </button>
+    </div>
+  </aside>
+
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+  <!-- ===================== MAIN ===================== -->
+  <div class="main-col">
+    <header class="topbar">
+      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Buka menu">
+        <svg class="icon" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div class="topbar-search">
+        <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input type="text" id="globalSearch" placeholder="Cari produk, transaksi...">
+        <span class="kbd-hint">Ctrl+F</span>
+      </div>
+      <div class="topbar-right">
+        <div class="shift-badge"><span class="dot-live"></span> Shift Aktif</div>
+        <button class="icon-btn" title="Notifikasi">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+          <span class="dot" id="notifDot" style="display:none;"></span>
+        </button>
+        <div class="user-chip" id="userChip">
+          <div class="avatar" id="userAvatar">A</div>
+          <div>
+            <div class="u-name" id="userName">-</div>
+            <div class="u-role" id="userRole">-</div>
+          </div>
+        </div>
+        <button class="logout-btn" id="logoutBtn">
+          <svg class="icon-sm" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+          Keluar
+        </button>
+      </div>
+    </header>
+
+    <!-- Setiap modul fitur (dashboard, kasir, produk, dst) menyuntikkan
+         <section class="view" id="view-xxx"> miliknya sendiri ke sini
+         lewat router.renderAllTemplates(). Lihat src/main.js -->
+    <main id="mainViews">
+      <section class="view" id="view-comingsoon">
+        <div class="page">
+          <div class="empty-state" style="padding:80px 20px;">
+            <svg class="icon-lg" viewBox="0 0 24 24" style="color:#cbd5e1;"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            <div class="es-title" id="comingSoonTitle">Segera Hadir</div>
+            <div>Fitur ini sedang dalam pengembangan.</div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<div class="toast-holder" id="toastHolder"></div>
+<div id="receiptModal"></div>
+<div id="stockAdjustModal"></div>
+<div id="heldOrdersModal"></div>
+<div id="returnModal"></div>
+
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>

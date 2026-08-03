@@ -1,0 +1,15 @@
+RewriteEngine On
+
+# Semua request /api/* diarahkan ke front controller PHP
+RewriteCond %{REQUEST_URI} ^/api/
+RewriteRule ^api/(.*)$ backend/api/index.php [QSA,L]
+
+# Blok akses langsung ke folder source & config (hanya lewat /api yang boleh)
+RewriteRule ^backend/(src|config)/ - [F,L]
+RewriteRule ^(database|documentation|frontend/src)/ - [F,L]
+
+# Jangan tampilkan daftar isi folder
+Options -Indexes
+
+# Halaman default
+DirectoryIndex index.html

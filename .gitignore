@@ -1,0 +1,18 @@
+# --- Rahasia / kredensial: JANGAN pernah commit ---
+backend/config/config.php
+backend/config/service-account.json
+
+# --- Frontend (Vite / Node) ---
+frontend/node_modules/
+# frontend/dist/ TIDAK di-gitignore lagi -- Vite sekarang build langsung
+# ke /docs (root repo) supaya bisa dipakai GitHub Pages, jadi folder itu
+# WAJIB ikut ter-commit. Lihat vite.config.js dan documentation/deploy-github-pages.md
+
+# --- OS / editor ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# --- Logs ---
+*.log

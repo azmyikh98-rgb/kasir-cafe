@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Masuk - Kasir Cafe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="login-body">
+  <div class="login-card">
+    <div class="login-brand">
+      <div class="logo-badge">
+        <svg class="icon-lg" viewBox="0 0 24 24"><path d="M3 3h18v6a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V3z"/><path d="M7 13v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-5"/><path d="M17 8h2a2 2 0 0 1 2 2v1a2 2 0 0 1-2 2h-2"/></svg>
+      </div>
+    </div>
+    <h1>Kasir Cafe</h1>
+    <p class="subtitle">Masuk untuk mulai shift transaksi Anda</p>
+    <form id="loginForm">
+      <label>Username</label>
+      <input type="text" id="username" required autocomplete="username" placeholder="mis. admin">
+      <label>Password</label>
+      <input type="password" id="password" required autocomplete="current-password" placeholder="••••••">
+      <button type="submit" class="btn-submit">Masuk</button>
+      <p id="loginError" class="error-text"></p>
+    </form>
+  </div>
+<script type="module" src="/src/login.js"></script>
+</body>
+</html>

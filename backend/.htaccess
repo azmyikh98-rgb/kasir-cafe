@@ -1,0 +1,6 @@
+# Defense-in-depth: kalaupun folder ini bisa diakses langsung (mis. document
+# root server diarahkan ke sini), tetap blok semuanya kecuali api/index.php.
+<FilesMatch "^(?!index\.php$).*\.php$">
+  Require all denied
+</FilesMatch>
+Options -Indexes

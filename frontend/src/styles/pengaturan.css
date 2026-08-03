@@ -1,0 +1,29 @@
+/* ===== PENGATURAN (SETTINGS) ===== */
+.settings-tabs { display: flex; gap: 6px; border-bottom: 1px solid var(--color-border); margin-bottom: 20px; flex-wrap: wrap; }
+.settings-tab { padding: 10px 16px; border: none; background: none; font-size: 13px; font-weight: 600; color: var(--text-secondary); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.settings-tab:hover { color: var(--color-primary); }
+.settings-tab.active { color: var(--color-primary); border-bottom-color: var(--color-primary); }
+.field-hint { display: block; font-size: 11.5px; color: var(--text-secondary); margin-top: 4px; }
+.row-actions { display: flex; gap: 6px; }
+.btn-icon-sm { width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--radius-sm); border: 1px solid var(--color-border); background: #fff; cursor: pointer; color: var(--text-secondary); }
+.btn-icon-sm:hover { border-color: var(--color-primary); color: var(--color-primary); }
+.btn-icon-sm.danger:hover { border-color: var(--color-danger); color: var(--color-danger); }
+
+@media print {
+  .sidebar, .topbar, .report-filter-row button, #reportExportBtn, #reportPrintBtn { display: none !important; }
+}
+
+
+/* ===== Menu Access (Pengaturan > Akses Menu) ===== */
+.menu-access-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--color-border); }
+.menu-access-row:last-child { border-bottom: none; }
+.menu-access-row .ma-label { display: flex; align-items: center; gap: 10px; font-size: 13.5px; font-weight: 600; color: var(--text-primary); }
+.menu-access-row .ma-label .icon { width: 18px; height: 18px; color: var(--text-secondary); }
+.ma-switch { position: relative; display: inline-block; width: 40px; height: 22px; flex-shrink: 0; }
+.ma-switch input { opacity: 0; width: 0; height: 0; }
+.ma-switch .ma-slider { position: absolute; cursor: pointer; inset: 0; background-color: #CBD5E1; transition: var(--transition); border-radius: 999px; }
+.ma-switch .ma-slider::before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: #fff; transition: var(--transition); border-radius: 50%; }
+.ma-switch input:checked + .ma-slider { background-color: var(--color-primary); }
+.ma-switch input:checked + .ma-slider::before { transform: translateX(18px); }
+.ma-switch input:disabled + .ma-slider { opacity: 0.5; cursor: not-allowed; }
+#menuAccessCustomRow { background: var(--bg-hover, #F8FAFC); margin: 0 -16px 10px -16px; padding: 12px 16px; border-radius: 8px; border-bottom: none; }
