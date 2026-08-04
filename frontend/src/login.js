@@ -14,6 +14,17 @@ import { get, post, setToken } from './shared/api.js';
   }
 })();
 
+document.getElementById('togglePassword').addEventListener('click', () => {
+  const input = document.getElementById('password');
+  const showIcon = document.querySelector('.icon-eye-show');
+  const hideIcon = document.querySelector('.icon-eye-hide');
+  const isHidden = input.type === 'password';
+  input.type = isHidden ? 'text' : 'password';
+  showIcon.style.display = isHidden ? 'none' : '';
+  hideIcon.style.display = isHidden ? '' : 'none';
+  document.getElementById('togglePassword').setAttribute('aria-label', isHidden ? 'Sembunyikan password' : 'Tampilkan password');
+});
+
 document.getElementById('loginForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const username = document.getElementById('username').value.trim();
