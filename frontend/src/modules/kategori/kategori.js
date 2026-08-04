@@ -3,6 +3,7 @@ import { icon, CATEGORY_COLORS } from '../../shared/icons.js';
 import { store } from '../../shared/state.js';
 import { showToast } from '../../shared/toast.js';
 import { refreshCategories, invalidateAndReload } from '../../shared/catalog.js';
+import { importExportButtonsHtml, setupImportExport } from '../../shared/importExport.js';
 
 export const template = `
 <section class="view" id="view-kategori">
@@ -12,29 +13,34 @@ export const template = `
         <div class="page-title">Kategori</div>
         <div class="page-subtitle">Kelola kategori produk</div>
       </div>
-      <button class="btn btn-primary" id="openAddCategoryBtn">
-        <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
-        Tambah Kategori
-      </button>
-    </div>
-
-    <div class="card card-pad" id="categoryFormCard" style="display:none; margin-bottom:16px;">
-      <h3 id="categoryFormTitle" style="font-size:14.5px; margin-bottom:14px;">Tambah Kategori</h3>
-      <form id="categoryForm">
-        <input type="hidden" id="categoryId">
-        <div class="form-field" style="max-width:320px;"><label>Nama Kategori</label><input type="text" id="catName" required></div>
-        <label style="display:block; font-size:12px; color:var(--text-secondary); margin-bottom:6px; font-weight:500;">Warna</label>
-        <div class="color-picker" id="colorPicker"></div>
-        <div style="display:flex; gap:8px;">
-          <button type="submit" class="btn btn-primary">Simpan</button>
-          <button type="button" class="btn btn-ghost" id="cancelCategoryForm">Batal</button>
-        </div>
-      </form>
+      <div class="page-header-actions">
+        ${importExportButtonsHtml()}
+        <button class="btn btn-primary" id="openAddCategoryBtn">
+          <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+          Tambah Kategori
+        </button>
+      </div>
     </div>
 
     <div class="category-grid" id="categoryGrid"></div>
   </div>
 </section>
+
+<div class="modal-backdrop" id="categoryModal" style="display:none;">
+  <div class="modal-box">
+    <h3 id="categoryFormTitle">Tambah Kategori</h3>
+    <form id="categoryForm">
+      <input type="hidden" id="categoryId">
+      <div class="form-field"><label>Nama Kategori</label><input type="text" id="catName" required></div>
+      <label style="display:block; font-size:12px; color:var(--text-secondary); margin-bottom:6px; font-weight:500;">Warna</label>
+      <div class="color-picker" id="colorPicker"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" id="cancelCategoryForm">Batal</button>
+        <button type="submit" class="btn btn-primary">Simpan</button>
+      </div>
+    </form>
+  </div>
+</div>
 `;
 
 let selectedCategoryColor = CATEGORY_COLORS[0];
@@ -50,6 +56,9 @@ function renderColorPicker() {
     dot.addEventListener('click', () => { selectedCategoryColor = dot.dataset.color; renderColorPicker(); });
   });
 }
+
+function openCategoryModal() { document.getElementById('categoryModal').style.display = 'flex'; }
+function closeCategoryModal() { document.getElementById('categoryModal').style.display = 'none'; }
 
 function resetCategoryForm() {
   document.getElementById('categoryId').value = '';
@@ -91,8 +100,7 @@ export function renderCategoryGrid() {
         selectedCategoryColor = c.color;
         renderColorPicker();
         document.getElementById('categoryFormTitle').textContent = 'Edit Kategori';
-        document.getElementById('categoryFormCard').style.display = 'block';
-        document.getElementById('categoryFormCard').scrollIntoView({ behavior: 'smooth' });
+        openCategoryModal();
       } else if (btn.dataset.act === 'delete') {
         if (!confirm(`Hapus kategori "${c.name}"? Produk di kategori ini akan dipindahkan ke "Umum".`)) return;
         try {
@@ -110,10 +118,11 @@ export function renderCategoryGrid() {
 function setupCategoryForm() {
   document.getElementById('openAddCategoryBtn').addEventListener('click', () => {
     resetCategoryForm();
-    document.getElementById('categoryFormCard').style.display = 'block';
+    openCategoryModal();
   });
-  document.getElementById('cancelCategoryForm').addEventListener('click', () => {
-    document.getElementById('categoryFormCard').style.display = 'none';
+  document.getElementById('cancelCategoryForm').addEventListener('click', closeCategoryModal);
+  document.getElementById('categoryModal').addEventListener('click', (e) => {
+    if (e.target.id === 'categoryModal') closeCategoryModal();
   });
   document.getElementById('categoryForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -122,11 +131,34 @@ function setupCategoryForm() {
     try {
       if (id) { await put('/api/categories/' + id, payload); showToast('Kategori diperbarui', 'success'); }
       else { await post('/api/categories', payload); showToast('Kategori ditambahkan', 'success'); }
-      document.getElementById('categoryFormCard').style.display = 'none';
+      closeCategoryModal();
       await invalidateAndReload('categories');
       await invalidateAndReload('products');
       renderCategoryGrid();
     } catch (err) { showToast(err.message, 'error'); }
+  });
+}
+
+function setupCategoryImportExport() {
+  setupImportExport({
+    filename: 'kategori',
+    headers: ['Nama', 'Warna'],
+    getExportRows: () => store.categories.map(c => [c.name, c.color]),
+    onImport: async (rows) => {
+      let success = 0, failed = 0;
+      for (const row of rows) {
+        const name = row['Nama'] ?? row['name'] ?? row['Name'];
+        const color = row['Warna'] ?? row['color'] ?? row['Color'] ?? '#2563EB';
+        if (!name) { failed++; continue; }
+        try {
+          await post('/api/categories', { name: String(name), color: String(color) });
+          success++;
+        } catch (err) { failed++; }
+      }
+      await invalidateAndReload('categories');
+      renderCategoryGrid();
+      showToast(`Import selesai: ${success} berhasil${failed ? `, ${failed} gagal` : ''}`, failed ? 'error' : 'success');
+    },
   });
 }
 
@@ -137,6 +169,7 @@ export async function load() {
 
 export function init() {
   setupCategoryForm();
+  setupCategoryImportExport();
 }
 
 export default { id: 'kategori', template, init, load };

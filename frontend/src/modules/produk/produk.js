@@ -5,6 +5,7 @@ import { store } from '../../shared/state.js';
 import { showToast } from '../../shared/toast.js';
 import { invalidateAndReload } from '../../shared/catalog.js';
 import { on } from '../../shared/bus.js';
+import { importExportButtonsHtml, setupImportExport } from '../../shared/importExport.js';
 
 export const template = `
 <section class="view" id="view-produk">
@@ -14,46 +15,13 @@ export const template = `
         <div class="page-title">Produk</div>
         <div class="page-subtitle">Kelola daftar produk dan stok</div>
       </div>
-      <button class="btn btn-primary" id="openAddProductBtn">
-        <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
-        Tambah Produk
-      </button>
-    </div>
-
-    <div class="card card-pad" id="productFormCard" style="display:none; margin-bottom:16px;">
-      <h3 id="productFormTitle" style="font-size:14.5px; margin-bottom:14px;">Tambah Produk</h3>
-      <form id="productForm">
-        <input type="hidden" id="productId">
-        <div class="form-field" style="margin-bottom:14px;">
-          <label>Gambar Produk</label>
-          <div class="image-upload-row">
-            <div class="image-preview-box" id="pImagePreviewBox">
-              <img id="pImagePreview" style="display:none;" alt="Preview produk">
-              <span id="pImagePlaceholder"><svg class="icon-lg" viewBox="0 0 24 24" style="color:#cbd5e1;"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></span>
-            </div>
-            <div class="image-upload-actions">
-              <input type="file" id="pImageInput" accept="image/*" style="display:none;">
-              <button type="button" class="btn btn-ghost btn-sm" id="pImageUploadBtn">Pilih Gambar</button>
-              <button type="button" class="btn btn-ghost btn-sm" id="pImageRemoveBtn" style="display:none;">Hapus Gambar</button>
-              <span class="field-hint">Format JPG/PNG, otomatis dikompres agar hemat penyimpanan.</span>
-            </div>
-          </div>
-          <input type="hidden" id="pImageData">
-        </div>
-        <div class="form-grid-4">
-          <div class="form-field"><label>Nama Produk</label><input type="text" id="pName" required></div>
-          <div class="form-field"><label>Kategori</label><select id="pCategory"></select></div>
-          <div class="form-field"><label>Harga (Rp)</label><input type="number" id="pPrice" required></div>
-          <div class="form-field"><label>Stok</label><input type="number" id="pStock" required></div>
-        </div>
-        <label style="display:flex; align-items:center; gap:8px; font-size:13px; margin-bottom:14px;">
-          <input type="checkbox" id="pFavorite" style="width:16px;height:16px;"> Tandai sebagai produk favorit (tampil di atas halaman Kasir)
-        </label>
-        <div style="display:flex; gap:8px;">
-          <button type="submit" class="btn btn-primary">Simpan</button>
-          <button type="button" class="btn btn-ghost" id="cancelProductForm">Batal</button>
-        </div>
-      </form>
+      <div class="page-header-actions">
+        ${importExportButtonsHtml()}
+        <button class="btn btn-primary" id="openAddProductBtn">
+          <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+          Tambah Produk
+        </button>
+      </div>
     </div>
 
     <div class="pos-toolbar">
@@ -71,6 +39,44 @@ export const template = `
     </div>
   </div>
 </section>
+
+<div class="modal-backdrop" id="productModal" style="display:none;">
+  <div class="modal-box xwide">
+    <h3 id="productFormTitle">Tambah Produk</h3>
+    <form id="productForm">
+      <input type="hidden" id="productId">
+      <div class="form-field" style="margin-bottom:14px;">
+        <label>Gambar Produk</label>
+        <div class="image-upload-row">
+          <div class="image-preview-box" id="pImagePreviewBox">
+            <img id="pImagePreview" style="display:none;" alt="Preview produk">
+            <span id="pImagePlaceholder"><svg class="icon-lg" viewBox="0 0 24 24" style="color:#cbd5e1;"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></span>
+          </div>
+          <div class="image-upload-actions">
+            <input type="file" id="pImageInput" accept="image/*" style="display:none;">
+            <button type="button" class="btn btn-ghost btn-sm" id="pImageUploadBtn">Pilih Gambar</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="pImageRemoveBtn" style="display:none;">Hapus Gambar</button>
+            <span class="field-hint">Format JPG/PNG, otomatis dikompres agar hemat penyimpanan.</span>
+          </div>
+        </div>
+        <input type="hidden" id="pImageData">
+      </div>
+      <div class="form-grid-4">
+        <div class="form-field"><label>Nama Produk</label><input type="text" id="pName" required></div>
+        <div class="form-field"><label>Kategori</label><select id="pCategory"></select></div>
+        <div class="form-field"><label>Harga (Rp)</label><input type="number" id="pPrice" required></div>
+        <div class="form-field"><label>Stok</label><input type="number" id="pStock" required></div>
+      </div>
+      <label style="display:flex; align-items:center; gap:8px; font-size:13px; margin-bottom:14px;">
+        <input type="checkbox" id="pFavorite" style="width:16px;height:16px;"> Tandai sebagai produk favorit (tampil di atas halaman Kasir)
+      </label>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" id="cancelProductForm">Batal</button>
+        <button type="submit" class="btn btn-primary">Simpan</button>
+      </div>
+    </form>
+  </div>
+</div>
 `;
 
 function renderCategoryOptions() {
@@ -80,6 +86,9 @@ function renderCategoryOptions() {
   sel.innerHTML = store.categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
   if (currentVal && store.categories.some(c => c.name === currentVal)) sel.value = currentVal;
 }
+
+function openProductModal() { document.getElementById('productModal').style.display = 'flex'; }
+function closeProductModal() { document.getElementById('productModal').style.display = 'none'; }
 
 function setProductImagePreview(dataUrl) {
   document.getElementById('pImageData').value = dataUrl || '';
@@ -180,8 +189,7 @@ export function renderProductTable() {
         document.getElementById('pFavorite').checked = !!p.favorite;
         setProductImagePreview(p.image || '');
         document.getElementById('productFormTitle').textContent = 'Edit Produk';
-        document.getElementById('productFormCard').style.display = 'block';
-        document.getElementById('productFormCard').scrollIntoView({ behavior: 'smooth' });
+        openProductModal();
       } else if (link.dataset.act === 'delete') {
         if (!confirm(`Hapus produk "${p.name}"?`)) return;
         await del('/api/products/' + id);
@@ -196,10 +204,11 @@ export function renderProductTable() {
 function setupProductForm() {
   document.getElementById('openAddProductBtn').addEventListener('click', () => {
     resetProductForm();
-    document.getElementById('productFormCard').style.display = 'block';
+    openProductModal();
   });
-  document.getElementById('cancelProductForm').addEventListener('click', () => {
-    document.getElementById('productFormCard').style.display = 'none';
+  document.getElementById('cancelProductForm').addEventListener('click', closeProductModal);
+  document.getElementById('productModal').addEventListener('click', (e) => {
+    if (e.target.id === 'productModal') closeProductModal();
   });
   document.getElementById('pImageUploadBtn').addEventListener('click', () => document.getElementById('pImageInput').click());
   document.getElementById('pImageRemoveBtn').addEventListener('click', () => setProductImagePreview(''));
@@ -227,7 +236,7 @@ function setupProductForm() {
     try {
       if (id) { await put('/api/products/' + id, payload); showToast('Produk diperbarui', 'success'); }
       else { await post('/api/products', payload); showToast('Produk ditambahkan', 'success'); }
-      document.getElementById('productFormCard').style.display = 'none';
+      closeProductModal();
       await invalidateAndReload('products');
       renderProductTable();
     } catch (err) { showToast(err.message, 'error'); }
@@ -238,12 +247,42 @@ function setupProductForm() {
   on('catalog:categories-changed', renderCategoryOptions);
 }
 
+function setupProductImportExport() {
+  setupImportExport({
+    filename: 'produk',
+    headers: ['Nama', 'Kategori', 'Harga', 'Stok', 'Favorit'],
+    getExportRows: () => store.products.map(p => [p.name, p.category, p.price, p.stock, p.favorite ? 'Ya' : 'Tidak']),
+    onImport: async (rows) => {
+      let success = 0, failed = 0;
+      for (const row of rows) {
+        const name = row['Nama'] ?? row['name'] ?? row['Name'];
+        if (!name) { failed++; continue; }
+        const favoriteRaw = String(row['Favorit'] ?? row['favorite'] ?? '').toLowerCase();
+        try {
+          await post('/api/products', {
+            name: String(name),
+            category: String(row['Kategori'] ?? row['category'] ?? 'Umum'),
+            price: Number(row['Harga'] ?? row['price'] ?? 0),
+            stock: Number(row['Stok'] ?? row['stock'] ?? 0),
+            favorite: favoriteRaw === 'ya' || favoriteRaw === 'yes' || favoriteRaw === 'true' || favoriteRaw === '1',
+          });
+          success++;
+        } catch (err) { failed++; }
+      }
+      await invalidateAndReload('products');
+      renderProductTable();
+      showToast(`Import selesai: ${success} berhasil${failed ? `, ${failed} gagal` : ''}`, failed ? 'error' : 'success');
+    },
+  });
+}
+
 export async function load() {
   renderProductTable();
 }
 
 export function init() {
   setupProductForm();
+  setupProductImportExport();
 }
 
 export default { id: 'produk', template, init, load };

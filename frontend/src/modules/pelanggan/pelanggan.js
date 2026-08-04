@@ -4,6 +4,7 @@ import { rupiah, timeAgo } from '../../shared/format.js';
 import { store } from '../../shared/state.js';
 import { showToast } from '../../shared/toast.js';
 import { refreshCustomers, invalidateAndReload } from '../../shared/catalog.js';
+import { importExportButtonsHtml, setupImportExport } from '../../shared/importExport.js';
 
 export const template = `
 <section class="view" id="view-pelanggan">
@@ -13,31 +14,16 @@ export const template = `
         <div class="page-title">Pelanggan</div>
         <div class="page-subtitle">Kelola data pelanggan dan riwayat belanja</div>
       </div>
-      <button class="btn btn-primary" id="openAddCustomerBtn">
-        <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
-        Tambah Pelanggan
-      </button>
+      <div class="page-header-actions">
+        ${importExportButtonsHtml()}
+        <button class="btn btn-primary" id="openAddCustomerBtn">
+          <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+          Tambah Pelanggan
+        </button>
+      </div>
     </div>
 
     <div class="stat-grid stat-grid-3" id="customerStatGrid"></div>
-
-    <div class="card card-pad" id="customerFormCard" style="display:none; margin-bottom:16px;">
-      <h3 id="customerFormTitle" style="font-size:14.5px; margin-bottom:14px;">Tambah Pelanggan</h3>
-      <form id="customerForm">
-        <input type="hidden" id="customerId">
-        <div class="form-grid-2">
-          <div class="form-field"><label>Nama</label><input type="text" id="cName" required></div>
-          <div class="form-field"><label>Telepon</label><input type="text" id="cPhone" placeholder="08xxxxxxxxxx"></div>
-          <div class="form-field"><label>Email</label><input type="email" id="cEmail"></div>
-          <div class="form-field"><label>Alamat</label><input type="text" id="cAddress"></div>
-        </div>
-        <div class="form-field"><label>Catatan</label><input type="text" id="cNote" placeholder="mis. preferensi, alergi, dll"></div>
-        <div style="display:flex; gap:8px;">
-          <button type="submit" class="btn btn-primary">Simpan</button>
-          <button type="button" class="btn btn-ghost" id="cancelCustomerForm">Batal</button>
-        </div>
-      </form>
-    </div>
 
     <div class="pos-toolbar">
       <div class="search-box">
@@ -54,7 +40,30 @@ export const template = `
     </div>
   </div>
 </section>
+
+<div class="modal-backdrop" id="customerModal" style="display:none;">
+  <div class="modal-box wide">
+    <h3 id="customerFormTitle">Tambah Pelanggan</h3>
+    <form id="customerForm">
+      <input type="hidden" id="customerId">
+      <div class="form-grid-2">
+        <div class="form-field"><label>Nama</label><input type="text" id="cName" required></div>
+        <div class="form-field"><label>Telepon</label><input type="text" id="cPhone" placeholder="08xxxxxxxxxx"></div>
+        <div class="form-field"><label>Email</label><input type="email" id="cEmail"></div>
+        <div class="form-field"><label>Alamat</label><input type="text" id="cAddress"></div>
+      </div>
+      <div class="form-field"><label>Catatan</label><input type="text" id="cNote" placeholder="mis. preferensi, alergi, dll"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" id="cancelCustomerForm">Batal</button>
+        <button type="submit" class="btn btn-primary">Simpan</button>
+      </div>
+    </form>
+  </div>
+</div>
 `;
+
+function openCustomerModal() { document.getElementById('customerModal').style.display = 'flex'; }
+function closeCustomerModal() { document.getElementById('customerModal').style.display = 'none'; }
 
 function resetCustomerForm() {
   document.getElementById('customerId').value = '';
@@ -103,8 +112,7 @@ export function renderCustomerTable() {
         document.getElementById('cAddress').value = c.address;
         document.getElementById('cNote').value = c.note;
         document.getElementById('customerFormTitle').textContent = 'Edit Pelanggan';
-        document.getElementById('customerFormCard').style.display = 'block';
-        document.getElementById('customerFormCard').scrollIntoView({ behavior: 'smooth' });
+        openCustomerModal();
       } else if (link.dataset.act === 'delete') {
         if (!confirm(`Hapus pelanggan "${c.name}"?`)) return;
         try {
@@ -148,10 +156,11 @@ export function renderCustomerView() {
 function setupCustomerForm() {
   document.getElementById('openAddCustomerBtn').addEventListener('click', () => {
     resetCustomerForm();
-    document.getElementById('customerFormCard').style.display = 'block';
+    openCustomerModal();
   });
-  document.getElementById('cancelCustomerForm').addEventListener('click', () => {
-    document.getElementById('customerFormCard').style.display = 'none';
+  document.getElementById('cancelCustomerForm').addEventListener('click', closeCustomerModal);
+  document.getElementById('customerModal').addEventListener('click', (e) => {
+    if (e.target.id === 'customerModal') closeCustomerModal();
   });
   document.getElementById('customerForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -166,7 +175,7 @@ function setupCustomerForm() {
     try {
       if (id) { await put('/api/customers/' + id, payload); showToast('Pelanggan diperbarui', 'success'); }
       else { await post('/api/customers', payload); showToast('Pelanggan ditambahkan', 'success'); }
-      document.getElementById('customerFormCard').style.display = 'none';
+      closeCustomerModal();
       await refreshCustomers(document.getElementById('customerSearch').value);
       renderCustomerView();
     } catch (err) { showToast(err.message, 'error'); }
@@ -177,6 +186,34 @@ function setupCustomerForm() {
   });
 }
 
+function setupCustomerImportExport() {
+  setupImportExport({
+    filename: 'pelanggan',
+    headers: ['Nama', 'Telepon', 'Email', 'Alamat', 'Catatan'],
+    getExportRows: () => store.customers.map(c => [c.name, c.phone, c.email, c.address, c.note]),
+    onImport: async (rows) => {
+      let success = 0, failed = 0;
+      for (const row of rows) {
+        const name = row['Nama'] ?? row['name'] ?? row['Name'];
+        if (!name) { failed++; continue; }
+        try {
+          await post('/api/customers', {
+            name: String(name),
+            phone: String(row['Telepon'] ?? row['phone'] ?? ''),
+            email: String(row['Email'] ?? row['email'] ?? ''),
+            address: String(row['Alamat'] ?? row['address'] ?? ''),
+            note: String(row['Catatan'] ?? row['note'] ?? ''),
+          });
+          success++;
+        } catch (err) { failed++; }
+      }
+      await refreshCustomers();
+      renderCustomerView();
+      showToast(`Import selesai: ${success} berhasil${failed ? `, ${failed} gagal` : ''}`, failed ? 'error' : 'success');
+    },
+  });
+}
+
 export async function load() {
   await refreshCustomers();
   renderCustomerView();
@@ -184,6 +221,7 @@ export async function load() {
 
 export function init() {
   setupCustomerForm();
+  setupCustomerImportExport();
 }
 
 export default { id: 'pelanggan', template, init, load };
