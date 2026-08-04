@@ -68,7 +68,15 @@ export const template = `
           </div>
         </div>
         <div class="cart-columns">
-          <div class="cart-col-items">
+          <div class="cart-col-items expanded" id="cartColItems">
+            <button type="button" class="cart-items-accordion-toggle" id="cartItemsAccordionToggle">
+              <span class="cart-items-accordion-label">
+                <svg class="icon-sm" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                Daftar Belanja
+                <span class="badge blue" id="cartItemsAccordionBadge">0 item</span>
+              </span>
+              <svg class="icon-sm chevron" id="cartItemsAccordionChevron" viewBox="0 0 24 24" style="transform:rotate(180deg);"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
             <div class="cart-body" id="cartItems">
               <div class="cart-empty">
                 <svg class="icon-lg" viewBox="0 0 24 24" style="color:#cbd5e1;"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
@@ -284,7 +292,9 @@ function addToCart(productId) {
 
 function renderCart() {
   const el = document.getElementById('cartItems');
-  document.getElementById('cartCountBadge').textContent = cart.reduce((s, c) => s + c.qty, 0) + ' item';
+  const itemCount = cart.reduce((s, c) => s + c.qty, 0);
+  document.getElementById('cartCountBadge').textContent = itemCount + ' item';
+  document.getElementById('cartItemsAccordionBadge').textContent = itemCount + ' item';
   if (cart.length === 0) {
     el.innerHTML = `<div class="cart-empty"><svg class="icon-lg" viewBox="0 0 24 24" style="color:#cbd5e1;">${ICONS.cart}</svg><div>Keranjang masih kosong</div><div style="font-size:11.5px;">Klik produk di sebelah kiri untuk mulai</div></div>`;
   } else {
@@ -576,6 +586,10 @@ export function showReceipt(tx) {
 // SETUP & LIFECYCLE
 // ============================================================
 function setupPos() {
+  document.getElementById('cartItemsAccordionToggle').addEventListener('click', () => {
+    const expanded = document.getElementById('cartColItems').classList.toggle('expanded');
+    document.getElementById('cartItemsAccordionChevron').style.transform = expanded ? 'rotate(180deg)' : '';
+  });
   document.getElementById('posSearch').addEventListener('input', renderProductGrid);
   document.getElementById('posSearch').addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
