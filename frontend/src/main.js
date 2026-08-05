@@ -46,6 +46,8 @@ async function bootstrap() {
   initAllModules();
   setupLogout();
 
+  document.getElementById('kasirFab').addEventListener('click', () => switchView('kasir'));
+
   document.getElementById('globalSearch').addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
       switchView('kasir');
@@ -63,14 +65,19 @@ async function bootstrap() {
 // coba lagi, supaya masalahnya kelihatan dan gampang dilaporkan/didiagnosis.
 bootstrap().catch((err) => {
   console.error('Gagal memuat aplikasi:', err);
+  const stack = (err && err.stack) ? String(err.stack).replace(/</g, '&lt;') : 'Tidak ada detail teknis tambahan.';
   document.body.innerHTML = `
     <div style="display:flex; align-items:center; justify-content:center; min-height:100vh; padding:24px; font-family:system-ui,sans-serif; background:#F8FAFC;">
-      <div style="max-width:420px; text-align:center;">
+      <div style="max-width:560px; text-align:center; width:100%;">
         <div style="font-size:40px; margin-bottom:12px;">⚠️</div>
         <h2 style="margin:0 0 8px; color:#0F172A;">Gagal memuat aplikasi</h2>
         <p style="color:#64748B; font-size:14px; margin:0 0 16px;">${(err && err.message) || 'Terjadi kesalahan tak terduga.'}</p>
-        <p style="color:#94A3B8; font-size:12.5px; margin:0 0 20px;">Kemungkinan penyebab: URL Apps Script di <code>config.js</code> belum benar, deployment Apps Script belum di-authorize, atau koneksi internet bermasalah.</p>
-        <button onclick="location.reload()" style="background:#2563EB; color:#fff; border:none; padding:10px 20px; border-radius:8px; font-size:14px; cursor:pointer;">Coba Lagi</button>
+        <p style="color:#94A3B8; font-size:12.5px; margin:0 0 20px;">Kemungkinan penyebab: URL Apps Script di <code>config.js</code> belum benar, deployment Apps Script belum di-authorize, koneksi internet bermasalah, atau ada bug di kode.</p>
+        <button onclick="location.reload()" style="background:#2563EB; color:#fff; border:none; padding:10px 20px; border-radius:8px; font-size:14px; cursor:pointer; margin-bottom:20px;">Coba Lagi</button>
+        <details style="text-align:left; background:#0F172A; border-radius:8px; padding:12px 16px;">
+          <summary style="color:#94A3B8; font-size:12px; cursor:pointer;">Detail teknis (untuk debugging)</summary>
+          <pre style="color:#E2E8F0; font-size:11px; white-space:pre-wrap; word-break:break-word; margin-top:10px; line-height:1.6;">${stack}</pre>
+        </details>
       </div>
     </div>
   `;

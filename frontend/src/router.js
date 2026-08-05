@@ -34,6 +34,7 @@ export function switchView(viewId) {
   const el = document.getElementById('view-' + viewId);
   if (el) el.classList.add('active');
   document.querySelectorAll('.nav-item').forEach(el2 => el2.classList.toggle('active', el2.dataset.id === viewId));
+  document.getElementById('kasirFab')?.classList.toggle('hidden', viewId === 'kasir');
 
   const mod = registry.get(viewId);
   if (mod && typeof mod.load === 'function') mod.load();
