@@ -10,9 +10,27 @@ export async function requireSession() {
 }
 
 export function paintUserChip(user) {
+  const roleLabel = user.role === 'admin' ? 'Admin' : 'Kasir';
   document.getElementById('userName').textContent = user.name;
-  document.getElementById('userRole').textContent = user.role === 'admin' ? 'Admin' : 'Kasir';
+  document.getElementById('userRole').textContent = roleLabel;
+  document.getElementById('userNameDropdown').textContent = user.name;
+  document.getElementById('userRoleDropdown').textContent = roleLabel;
   document.getElementById('userAvatar').textContent = user.name.charAt(0).toUpperCase();
+}
+
+export function setupUserDropdown() {
+  const chip = document.getElementById('userChip');
+  const menu = document.getElementById('userDropdownMenu');
+  chip.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = menu.style.display !== 'none';
+    menu.style.display = isOpen ? 'none' : 'block';
+    chip.setAttribute('aria-expanded', String(!isOpen));
+  });
+  document.addEventListener('click', () => {
+    menu.style.display = 'none';
+    chip.setAttribute('aria-expanded', 'false');
+  });
 }
 
 export function setupLogout() {

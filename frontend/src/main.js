@@ -10,7 +10,7 @@ import './styles/retur.css';
 import './styles/laporan.css';
 import './styles/pengaturan.css';
 
-import { requireSession, paintUserChip, setupLogout } from './modules/auth/session.js';
+import { requireSession, paintUserChip, setupLogout, setupUserDropdown } from './modules/auth/session.js';
 import { store, getDefaultView } from './shared/state.js';
 import { registerModule, renderAllTemplates, initAllModules, switchView } from './router.js';
 import { get } from './shared/api.js';
@@ -45,6 +45,7 @@ async function bootstrap() {
   initSidebar();
   initAllModules();
   setupLogout();
+  setupUserDropdown();
 
   document.getElementById('kasirFab').addEventListener('click', () => switchView('kasir'));
 

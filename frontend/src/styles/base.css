@@ -132,24 +132,32 @@ button, input, select { font-family: var(--font-sans); }
 }
 .icon-btn:hover { border-color: var(--color-primary); color: var(--color-primary); }
 .icon-btn .dot { position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; border-radius: 50%; background: var(--color-danger); }
-.shift-badge {
-  display: flex; align-items: center; gap: 6px; background: var(--color-success-soft); color: #16803c;
-  padding: 6px 12px; border-radius: var(--radius-full); font-size: 12px; font-weight: 600;
+.user-chip-wrap { position: relative; }
+.user-chip {
+  display: flex; align-items: center; gap: 10px; padding: 5px 10px 5px 5px; border-radius: var(--radius-full);
+  cursor: pointer; border: none; background: transparent; transition: var(--transition);
 }
-.shift-badge .dot-live { width: 7px; height: 7px; border-radius: 50%; background: var(--color-success); }
-.user-chip { display: flex; align-items: center; gap: 10px; padding: 5px 6px 5px 5px; border-radius: var(--radius-full); cursor: pointer; }
+.user-chip:hover { background: var(--color-bg); }
+.user-chip .chevron { color: var(--text-secondary); transition: transform 160ms ease; }
+.user-chip[aria-expanded="true"] .chevron { transform: rotate(180deg); }
 .avatar {
   width: 32px; height: 32px; border-radius: 50%; background: var(--color-primary); color: #fff;
   display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0;
 }
-.user-chip .u-name { font-size: 13px; font-weight: 600; line-height: 1.2; }
-.user-chip .u-role { font-size: 11px; color: var(--text-secondary); }
-.logout-btn {
-  border: none; background: var(--color-danger-soft); color: var(--color-danger); padding: 8px 12px;
-  border-radius: var(--radius-md); cursor: pointer; font-size: 12.5px; font-weight: 600; display: flex; align-items: center; gap: 6px;
-  transition: var(--transition);
+.user-chip .u-name { font-size: 13px; font-weight: 600; line-height: 1.2; text-align: left; }
+.user-chip .u-role { font-size: 11px; color: var(--text-secondary); text-align: left; }
+.user-dropdown-menu {
+  position: absolute; top: calc(100% + 8px); right: 0; background: #fff; border: 1px solid var(--color-border);
+  border-radius: var(--radius-md); box-shadow: var(--shadow-md); min-width: 200px; z-index: 60; overflow: hidden;
 }
-.logout-btn:hover { background: var(--color-danger); color: #fff; }
+.user-dropdown-header { padding: 12px 14px; border-bottom: 1px solid var(--color-border); }
+.user-dropdown-header .u-name { font-size: 13.5px; font-weight: 700; color: var(--text-primary); }
+.user-dropdown-header .u-role { font-size: 11.5px; color: var(--text-secondary); margin-top: 2px; }
+.user-dropdown-item {
+  display: flex; align-items: center; gap: 8px; width: 100%; padding: 10px 14px; border: none; background: none;
+  text-align: left; font-size: 13px; font-weight: 600; cursor: pointer; color: var(--color-danger); transition: var(--transition);
+}
+.user-dropdown-item:hover { background: var(--color-danger-soft); }
 
 .page { padding: var(--space-6); max-width: 1500px; margin: 0 auto; width: 100%; }
 .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-5); flex-wrap: wrap; gap: var(--space-3); }
@@ -488,8 +496,6 @@ table.data-table tbody tr:last-child td { border-bottom: none; }
   .topbar { padding: 0 var(--space-4); gap: var(--space-2); }
   .page { padding: var(--space-4); }
   .stat-grid { grid-template-columns: 1fr 1fr; }
-  .shift-badge span:not(.dot-live) { display: none; }
-  .shift-badge { padding: 6px 9px; }
 }
 /* Phone */
 @media (max-width: 640px) {
@@ -500,8 +506,7 @@ table.data-table tbody tr:last-child td { border-bottom: none; }
   .page-title { font-size: 17px; }
   .topbar-right { gap: var(--space-2); }
   .user-chip > div:last-child { display: none; }
-  .logout-btn span { display: none; }
-  .logout-btn { padding: 8px; }
+  .user-chip .chevron { display: none; }
   .cart-bar-customer { max-width: 110px; }
   .cart-bar { padding: 10px 12px; }
   .modal-box { padding: var(--space-4); }

@@ -52,22 +52,30 @@
         <span class="kbd-hint">Ctrl+F</span>
       </div>
       <div class="topbar-right">
-        <div class="shift-badge"><span class="dot-live"></span> Shift Aktif</div>
         <button class="icon-btn" title="Notifikasi">
           <svg class="icon" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
           <span class="dot" id="notifDot" style="display:none;"></span>
         </button>
-        <div class="user-chip" id="userChip">
-          <div class="avatar" id="userAvatar">A</div>
-          <div>
-            <div class="u-name" id="userName">-</div>
-            <div class="u-role" id="userRole">-</div>
+        <div class="user-chip-wrap">
+          <button class="user-chip" id="userChip" aria-expanded="false">
+            <div class="avatar" id="userAvatar">A</div>
+            <div>
+              <div class="u-name" id="userName">-</div>
+              <div class="u-role" id="userRole">-</div>
+            </div>
+            <svg class="icon-sm chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="user-dropdown-menu" id="userDropdownMenu" style="display:none;">
+            <div class="user-dropdown-header">
+              <div class="u-name" id="userNameDropdown">-</div>
+              <div class="u-role" id="userRoleDropdown">-</div>
+            </div>
+            <button class="user-dropdown-item" id="logoutBtn">
+              <svg class="icon-sm" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+              Keluar
+            </button>
           </div>
         </div>
-        <button class="logout-btn" id="logoutBtn">
-          <svg class="icon-sm" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
-          Keluar
-        </button>
       </div>
     </header>
 
