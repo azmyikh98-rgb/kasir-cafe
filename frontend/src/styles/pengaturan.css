@@ -27,3 +27,10 @@
 .ma-switch input:checked + .ma-slider::before { transform: translateX(18px); }
 .ma-switch input:disabled + .ma-slider { opacity: 0.5; cursor: not-allowed; }
 #menuAccessCustomRow { background: var(--bg-hover, #F8FAFC); margin: 0 -16px 10px -16px; padding: 12px 16px; border-radius: 8px; border-bottom: none; }
+
+/* ===== Printer (Pengaturan > Printer) ===== */
+.printer-status-box { display: flex; align-items: center; gap: 12px; padding: 14px; background: var(--color-bg); border-radius: var(--radius-md); border: 1px solid var(--color-border); }
+.printer-status-dot { width: 12px; height: 12px; border-radius: 50%; background: #CBD5E1; flex-shrink: 0; }
+.printer-status-dot.connected { background: var(--color-success); box-shadow: 0 0 0 4px var(--color-success-soft); }
+.printer-status-label { font-size: 13.5px; font-weight: 700; color: var(--text-primary); }
+.printer-status-sub { font-size: 11.5px; color: var(--text-secondary); margin-top: 2px; }

@@ -4,6 +4,8 @@ import { store, canAccessMenu, getDefaultView, NAV_ITEMS, MENU_ACCESS_KEYS } fro
 import { showToast } from '../../shared/toast.js';
 import { switchView } from '../../router.js';
 import { renderSidebar } from '../sidebar/sidebar.js';
+import { getStatus as getPrinterStatus, getLastKnownMeta, connectBluetooth, connectUsb, disconnect as disconnectPrinter, printRawText } from '../../shared/printer.js';
+import { on } from '../../shared/bus.js';
 
 export const template = `
 <section class="view" id="view-pengaturan">
@@ -20,6 +22,7 @@ export const template = `
       <button class="settings-tab" data-tab="preferensi">Preferensi</button>
       <button class="settings-tab" data-tab="pengguna">Pengguna</button>
       <button class="settings-tab" data-tab="aksesmenu">Akses Menu</button>
+      <button class="settings-tab" data-tab="printer">Printer</button>
       <button class="settings-tab" data-tab="keamanan">Keamanan</button>
     </div>
 
@@ -96,6 +99,35 @@ export const template = `
       </div>
     </div>
 
+    <div class="settings-panel" id="panel-printer" style="display:none;">
+      <div class="card card-pad" style="max-width:520px;">
+        <h3 style="font-size:14.5px; margin-bottom:4px;">Koneksi Printer Struk</h3>
+        <p class="field-hint" style="margin-bottom:16px;">Hubungkan printer struk thermal lewat Bluetooth atau USB. Fitur ini hanya berfungsi di browser Chrome/Edge (desktop atau Android) -- tidak didukung Firefox maupun Safari/iOS.</p>
+
+        <div class="printer-status-box" id="printerStatusBox">
+          <span class="printer-status-dot" id="printerStatusDot"></span>
+          <div>
+            <div class="printer-status-label" id="printerStatusLabel">Tidak Terhubung</div>
+            <div class="printer-status-sub" id="printerStatusSub">Belum ada printer yang tersambung</div>
+          </div>
+        </div>
+
+        <div class="form-field" style="margin-top:16px;">
+          <label>Jenis Koneksi</label>
+          <select id="printerTypeSelect">
+            <option value="bluetooth">Bluetooth</option>
+            <option value="usb">USB</option>
+          </select>
+        </div>
+
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-primary" id="connectPrinterBtn">Hubungkan Printer</button>
+          <button class="btn btn-ghost" id="disconnectPrinterBtn" style="display:none;">Putuskan Koneksi</button>
+        </div>
+        <button class="btn btn-secondary btn-sm" id="testPrintBtn" style="margin-top:10px; display:none;">Cetak Struk Percobaan</button>
+      </div>
+    </div>
+
     <div class="settings-panel" id="panel-keamanan" style="display:none;">
       <div class="card card-pad" style="max-width:480px;">
         <h3 style="font-size:14.5px; margin-bottom:12px;">Ganti Password</h3>
@@ -132,7 +164,7 @@ async function loadSettingsIntoForm() {
   onMenuAccessTargetChange();
   const tabsEl = document.getElementById('settingsTabs');
   tabsEl.querySelectorAll('.settings-tab').forEach(tab => {
-    if (tab.dataset.tab !== 'keamanan') tab.style.display = isAdmin ? '' : 'none';
+    if (tab.dataset.tab !== 'keamanan' && tab.dataset.tab !== 'printer') tab.style.display = isAdmin ? '' : 'none';
   });
   if (!isAdmin) switchSettingsTab('keamanan');
 }
@@ -333,6 +365,63 @@ async function saveUser() {
   } catch (err) { showToast(err.message, 'error'); }
 }
 
+function renderPrinterStatus() {
+  const status = getPrinterStatus();
+  const dot = document.getElementById('printerStatusDot');
+  const label = document.getElementById('printerStatusLabel');
+  const sub = document.getElementById('printerStatusSub');
+  const connectBtn = document.getElementById('connectPrinterBtn');
+  const disconnectBtn = document.getElementById('disconnectPrinterBtn');
+  const testBtn = document.getElementById('testPrintBtn');
+
+  if (status.connected) {
+    dot.className = 'printer-status-dot connected';
+    label.textContent = 'Terhubung';
+    sub.textContent = `${status.type === 'bluetooth' ? 'Bluetooth' : 'USB'} · ${status.deviceName}`;
+    connectBtn.style.display = 'none';
+    disconnectBtn.style.display = '';
+    testBtn.style.display = '';
+  } else {
+    dot.className = 'printer-status-dot';
+    label.textContent = 'Tidak Terhubung';
+    const last = getLastKnownMeta();
+    sub.textContent = last ? `Terakhir: ${last.type === 'bluetooth' ? 'Bluetooth' : 'USB'} · ${last.deviceName} (perlu hubungkan ulang)` : 'Belum ada printer yang tersambung';
+    connectBtn.style.display = '';
+    disconnectBtn.style.display = 'none';
+    testBtn.style.display = 'none';
+  }
+}
+
+function setupPrinterPanel() {
+  renderPrinterStatus();
+  on('printer:status-changed', renderPrinterStatus);
+
+  document.getElementById('connectPrinterBtn').addEventListener('click', async () => {
+    const type = document.getElementById('printerTypeSelect').value;
+    try {
+      if (type === 'bluetooth') await connectBluetooth();
+      else await connectUsb();
+      showToast('Printer berhasil terhubung', 'success');
+    } catch (err) {
+      showToast(err.message || 'Gagal menghubungkan printer', 'error');
+    }
+  });
+
+  document.getElementById('disconnectPrinterBtn').addEventListener('click', async () => {
+    await disconnectPrinter();
+    showToast('Printer diputuskan');
+  });
+
+  document.getElementById('testPrintBtn').addEventListener('click', async () => {
+    try {
+      await printRawText(`${store.appSettings.storeName || 'Kasir Cafe'}\nIni adalah struk percobaan\n${new Date().toLocaleString('id-ID')}`);
+      showToast('Perintah cetak terkirim ke printer', 'success');
+    } catch (err) {
+      showToast(err.message || 'Gagal mencetak', 'error');
+    }
+  });
+}
+
 export async function load() {
   await loadSettingsIntoForm();
   await loadUserList();
@@ -351,6 +440,7 @@ export function init() {
   document.getElementById('saveMenuAccessBtn').addEventListener('click', saveMenuAccess);
   document.getElementById('menuAccessTarget').addEventListener('change', onMenuAccessTargetChange);
   document.getElementById('menuAccessCustomCheckbox').addEventListener('change', renderMenuAccessList);
+  setupPrinterPanel();
 }
 
 export default { id: 'pengaturan', template, init, load };

@@ -6,6 +6,7 @@ import { showToast } from '../../shared/toast.js';
 import { refreshProducts, invalidateAndReload } from '../../shared/catalog.js';
 import { switchView } from '../../router.js';
 import { on } from '../../shared/bus.js';
+import { getStatus as getPrinterStatus } from '../../shared/printer.js';
 
 export const template = `
 <section class="view" id="view-kasir">
@@ -15,6 +16,11 @@ export const template = `
         <div class="page-title">Kasir</div>
         <div class="page-subtitle">Pilih produk, atur keranjang, lalu proses pembayaran</div>
       </div>
+      <button type="button" class="printer-badge" id="kasirPrinterBadge" title="Klik untuk atur printer">
+        <span class="printer-badge-dot" id="kasirPrinterBadgeDot"></span>
+        <svg class="icon-sm" viewBox="0 0 24 24"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        <span id="kasirPrinterBadgeText">Printer: Tidak Terhubung</span>
+      </button>
     </div>
 
     <div class="pos-grid">
@@ -631,6 +637,26 @@ function setupPos() {
   // saat modul produk/kategori mengubah data, refresh grid & tab kasir juga
   on('catalog:products-changed', () => { renderCategoryTabs(); renderProductGrid(); });
   on('catalog:categories-changed', () => renderCategoryTabs());
+
+  renderPrinterBadge();
+  on('printer:status-changed', renderPrinterBadge);
+  document.getElementById('kasirPrinterBadge').addEventListener('click', () => switchView('pengaturan'));
+}
+
+function renderPrinterBadge() {
+  const status = getPrinterStatus();
+  const badge = document.getElementById('kasirPrinterBadge');
+  const dot = document.getElementById('kasirPrinterBadgeDot');
+  const text = document.getElementById('kasirPrinterBadgeText');
+  if (status.connected) {
+    badge.classList.add('connected');
+    dot.classList.add('connected');
+    text.textContent = `Printer: Terhubung (${status.type === 'bluetooth' ? 'Bluetooth' : 'USB'})`;
+  } else {
+    badge.classList.remove('connected');
+    dot.classList.remove('connected');
+    text.textContent = 'Printer: Tidak Terhubung';
+  }
 }
 
 export async function load() {
